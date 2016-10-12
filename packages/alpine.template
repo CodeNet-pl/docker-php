@@ -1,0 +1,24 @@
+install_extension() {
+    case $ext in
+        gd)
+            apk_install "libpng libpng-dev"
+            php_install "gd"
+            apk_remove "libpng-dev"
+            ;;
+        mysqli | pdo | pdo_mysql)
+            php_install "$ext"
+            ;;
+        intl)
+            apk_install "icu-dev"
+            php_install "intl"
+            ;;
+        mongo)
+            apk_install "autoconf g++ make openssl-dev"
+            pecl_install "mongo"
+            apk_remove "autoconf g++ make openssl-dev"
+            ;;
+        *)
+            err "Unsupported extension $ext, please open a pull request here: https://github.com/CodeNet-pl/docker-php"
+            ;;
+    esac
+}

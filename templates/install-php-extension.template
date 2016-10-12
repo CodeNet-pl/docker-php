@@ -1,0 +1,90 @@
+#!/bin/sh
+
+err()
+{
+    echo $1 1>&2
+    exit 1
+}
+
+is_installed()
+{
+    installed=$(php -m)
+
+    [ -z "${installed##*$1*}" ]
+}
+
+nproc=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1)
+php_extensions=""
+php_configure=""
+packages=""
+pecl_packages=""
+del_packages=""
+
+apk_install()
+{
+    packages="$packages $@"
+}
+pecl_install()
+{
+    pecl_packages="$pecl_packages $@"
+}
+php_install()
+{
+    php_extensions="$php_extensions $@"
+}
+php_configure()
+{
+    php_configure="$php_configure $@"
+}
+
+apk_remove()
+{
+    del_packages="$del_packages $@"
+}
+
+${INSTALLER}
+
+if [ -z $1 ]; then
+    echo "Usage: install-php-extension ext1 [ext2] [ext3] [...]"
+    exit 1
+fi
+
+for ext in "$@" ; do
+    if is_installed "$ext"; then
+        err "Package $ext is already installed"
+    fi
+    install_extension "$ext"
+done
+
+if [[ ! -z "$packages" ]]; then
+    echo "Installing system packages:$packages"
+    apk --no-cache add $packages || exit 1
+fi
+
+if [[ ! -z "$php_extensions" ]]; then
+    echo "Installing PHP extensions:$php_extensions"
+    docker-php-ext-install -j$nproc $php_extensions || exit 1
+fi
+
+if [[ ! -z "$pecl_packages" ]]; then
+    echo "Installing PECL extensions:$pecl_packages"
+    pecl install $pecl_packages || exit 1
+    docker-php-ext-enable $pecl_packages || exit 1
+fi
+
+if [[ ! -z "$php_configure" ]]; then
+    echo "Configuring PHP extensions:$php_configure"
+    docker-php-ext-configure -j$nproc $php_configure || exit 1
+fi
+
+if [[ ! -z "$del_packages" ]]; then
+    echo "Cleaning up packages$del_packages"
+    apk del $del_packages || exit 1
+fi
+
+# Verify that PHP module was properly installed
+for ext in "$@" ; do
+    if ! is_installed "$ext"; then
+        err "Unable to install extension $ext"
+    fi
+done

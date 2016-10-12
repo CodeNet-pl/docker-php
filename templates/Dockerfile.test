@@ -1,0 +1,3 @@
+FROM codenet/php:$DOCKER_PHP_VERSION
+
+RUN install-php-extension $EXTENSIONS

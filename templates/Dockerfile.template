@@ -1,0 +1,4 @@
+FROM php:$DOCKER_PHP_VERSION
+
+ADD install-php-extension /bin/
+RUN chmod +x /bin/install-php-extension
