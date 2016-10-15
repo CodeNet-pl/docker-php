@@ -22,7 +22,7 @@ docker pull php:${DOCKER_PHP_VERSION} || exit 1;
 docker build --no-cache -t codenet/php:${DOCKER_PHP_VERSION} build || exit 1;
 
 # Run basic test (install all available packages)
-all_extensions="gd mysqli pdo_mysql mongo"
+all_extensions="imagick gd mysqli pdo_mysql mongo"
 
 # test all extensions separately
 for ext in $all_extensions; do

@@ -17,6 +17,11 @@ install_extension() {
             pecl_install "mongo"
             apk_remove "autoconf g++ make openssl-dev"
             ;;
+        imagick)
+            apk_install "autoconf g++ make imagemagick imagemagick-dev libtool"
+            pecl_install "imagick"
+            apk_remove "autoconf g++ make imagemagick-dev"
+            ;;
         *)
             err "Unsupported extension $ext, please open a pull request here: https://github.com/CodeNet-pl/docker-php"
             ;;

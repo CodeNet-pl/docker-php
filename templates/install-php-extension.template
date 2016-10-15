@@ -77,10 +77,11 @@ if [[ ! -z "$php_configure" ]]; then
     docker-php-ext-configure -j$nproc $php_configure || exit 1
 fi
 
-if [[ ! -z "$del_packages" ]]; then
-    echo "Cleaning up packages$del_packages"
-    apk del $del_packages || exit 1
-fi
+# Purge dev APK packages
+apk del --purge *-dev build-base autoconf libtool $del_packages || exit 1
+
+# Cleanup after phpizing
+rm -rf /usr/include/php /usr/lib/php/build /usr/lib/php5/modules/*.a || exit 1
 
 # Verify that PHP module was properly installed
 for ext in "$@" ; do

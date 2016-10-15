@@ -24,6 +24,7 @@ Available PHP modules (to install)
 * pdo_mysql
 * mongo
 * apcu
+* imagick
 
 Pre-installed modules
 ---
