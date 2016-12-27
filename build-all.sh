@@ -1,16 +1,24 @@
 #!/bin/sh
 
-sh build.sh 5.6.26-fpm-alpine && \
-sh build.sh 5.6-fpm-alpine && \
-sh build.sh 5-fpm-alpine && \
+major="5"
+minor="5.6"
+patch="5.6.26 5.6.27 5.6.28"
 
-sh build.sh 5.6.26-alpine && \
-sh build.sh 5.6-alpine && \
-sh build.sh 5-alpine && \
-
-sh build.sh 5.6.26-zts-alpine && \
-sh build.sh 5.6-zts-alpine && \
-sh build.sh 5-zts-alpine && \
+for ma in $major; do
+    for mi in $minor; do
+        for pa in $patch; do
+            sh build.sh $pa-alpine
+            sh build.sh $pa-fpm-alpine
+            sh build.sh $pa-zts-alpine
+        done
+        sh build.sh $mi-alpine
+        sh build.sh $mi-fpm-alpine
+        sh build.sh $mi-zts-alpine
+    done
+    sh build.sh $ma-alpine
+    sh build.sh $ma-fpm-alpine
+    sh build.sh $ma-zts-alpine
+done
 
 exit 0
 

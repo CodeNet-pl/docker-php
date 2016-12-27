@@ -69,7 +69,9 @@ fi
 if [[ ! -z "$pecl_packages" ]]; then
     echo "Installing PECL extensions:$pecl_packages"
     pecl install $pecl_packages || exit 1
-    docker-php-ext-enable $pecl_packages || exit 1
+    # remove package version from name
+    enable_packages=`echo $pecl_packages | sed -e 's/-[^ ]*//g'`
+    docker-php-ext-enable $enable_packages || exit 1
 fi
 
 if [[ ! -z "$php_configure" ]]; then
