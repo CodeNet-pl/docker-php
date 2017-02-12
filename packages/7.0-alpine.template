@@ -1,0 +1,32 @@
+install_extension() {
+    case $ext in
+        gd)
+            apk_install "libpng libpng-dev"
+            php_install "gd"
+            ;;
+        bcmath | mysqli | pdo | pdo_mysql)
+            php_install "$ext"
+            ;;
+        intl)
+            apk_install "icu-dev"
+            php_install "intl"
+            ;;
+        apc | apcu)
+            pecl_install "apcu"
+            ;;
+        mongodb | mongo)
+            apk_install "openssl-dev"
+            pecl_install "mongodb"
+            ;;
+        imagick)
+            apk_install "imagemagick imagemagick-dev libtool"
+            pecl_install "imagick"
+            ;;
+        xdebug)
+            pecl_install "xdebug"
+            ;;
+        *)
+            err "Unsupported extension $ext, please open a pull request here: https://github.com/CodeNet-pl/docker-php"
+            ;;
+    esac
+}

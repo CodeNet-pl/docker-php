@@ -14,17 +14,18 @@ cleanup() {
 
 cleanup
 
-INSTALLER=$(cat packages/alpine.template)
-export DOCKER_PHP_VERSION=$1
+INSTALLER=$(cat packages/$1-alpine.template)
+export DOCKER_PHP_VERSION=$2
 export INSTALLER;
 
 envsubst '$DOCKER_PHP_VERSION' < templates/Dockerfile.template > build/Dockerfile
 envsubst '$INSTALLER' < templates/install-php-extension.template > build/install-php-extension
-docker pull php:${DOCKER_PHP_VERSION} || exit 1;
-docker build --no-cache -t codenet/php:${DOCKER_PHP_VERSION} build || exit 1;
 
-# Run basic test (install all available packages)
-all_extensions="xdebug apcu imagick gd mysqli pdo_mysql mongo"
+echo "Building image codenet/php:${DOCKER_PHP_VERSION}..."
+docker build --pull --no-cache -t codenet/php:${DOCKER_PHP_VERSION} build > /dev/null || exit 1;
+
+# Run basic test (install all available packages one by one)
+all_extensions="xdebug apcu imagick gd mysqli pdo_mysql"
 
 if [ ! -z $test ]; then
     # test all extensions separately
@@ -41,6 +42,7 @@ if [ ! -z $test ]; then
 fi
 
 # Push if test has passed
-docker push codenet/php:$DOCKER_PHP_VERSION
+echo "Pushing image codenet/php:${DOCKER_PHP_VERSION}..."
+docker push codenet/php:$DOCKER_PHP_VERSION > /dev/null || exit 1
 
 cleanup
